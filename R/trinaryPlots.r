@@ -1,65 +1,6 @@
 #################################################################
 #################################################################
 #################################################################
-#' Plot trinary map raster
-#'
-#' This function plots the trinary map raster for a given species. The raster will have three colors: grey for the area with no prediction, blue for the predicted presence area, and red for the predicted absence area. Additionally, if the \code{pres} argument is provided, the function will overlay presence data in grey crosses on the plot. If the \code{shapesToPlot} argument is provided, the function will overlay the specified shapefiles on the plot. If a \code{plotFile} is provided, the plot will be saved to that file. If \code{openFig} is TRUE, the plot will also be opened in the system's default PDF viewer.
-#'
-#' @param trinaryRaster Trinary map raster created by \code{\link{trinaryMapWorkflow}}.
-#' @param plotFile File to save plot. If NULL, plot is not saved.
-#' @param pres Presence data to overlay on plot. If NULL, presence data is not included.
-#' @param main Title for plot. Default is NULL.
-#' @param shapesToPlot List of shapefiles to overlay on plot. Default is NULL.
-#' @param openFig Logical indicating whether to open plot in system's default PDF viewer. Default is TRUE.
-#'
-#' @return None
-#'
-#' @examples
-#' \dontrun{
-#' # plot trinary map for species 1
-#' trinaryMapPlot(trinaryRaster = trinaryMapSDMPW1$trinaryMap,
-#' pres = species1Presences,
-#' shapesToPlot = list(world.shp),
-#' plotFile = "trinary_map_species1.pdf",
-#' openFig = TRUE)
-#' }
-
-trinaryMapPlot=function(trinaryRaster,
-												plotFile=NULL,
-												pres=NULL,
-												main=NULL,					
-												shapesToPlot=NULL,
-												openFig=TRUE){
-
-	#  for testing
-	#  
-	if(!is.null(plotFile))  grDevices::pdf(plotFile,h=7,w=7)
-
-	if(!is.null(pres)){
-		if(is.na(projection(pres))) {
-			projection(pres)=projection(trinaryRaster)
-			message('The projection for your presences was not specified, so assuming its the same as your rasters')
-		}
-	}
-	if(!is.null(plotFile))  grDevices::pdf(plotFile,h=7,w=7)
-
-		raster::image(trinaryRaster==0, xlab='',ylab='',col=c(grey(1,0),'grey80'),xaxt='n', yaxt='n',bty='n',main=main)
-		raster::image(trinaryRaster==1, xlab='',ylab='',col=c(grey(1,0),'steelblue'),xaxt='n', yaxt='n',bty='n',add=TRUE)
-		raster::image(trinaryRaster>=2, xlab='',ylab='',col=c(grey(1,0),'red1'),xaxt='n', yaxt='n',bty='n',add=TRUE)
-
-
-		if(!is.null(pres)) graphics::points(pres,col='grey90',pch='+',cex=.4)
-
-		if(!is.null(shapesToPlot)) lapply(shapesToPlot,sp::plot,add=T,lwd=.1,border='grey40')
-
-	if(!is.null(plotFile))  grDevices::dev.off(); if(openFig) system(paste0('open ',plotFile))
-	
-}
-
-
-#################################################################
-#################################################################
-#################################################################
 #' Plot trinary ROC curve and save the output as pdf file.
 #'
 #' @param trinaryPlotThings Object of trinary ROC curve, contains xx, y, xout, and y. as its attributes.
