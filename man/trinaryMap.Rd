@@ -4,16 +4,21 @@
 \alias{trinaryMap}
 \title{Make trinary maps}
 \usage{
-trinaryMap(
-  model,
-  threshLo,
-  threshHi,
-  threshYouden,
-  modelNames,
-  species,
-  rasterOutputDir = NULL,
-  ...
-)
+trinaryMap(rModel, threshLo, threshHi, rasterOutputPath = NULL, ...)
+}
+\arguments{
+\item{rModel}{spatRaster representing continuous model predictions}
+
+\item{threshLo}{lower threshold value; typically determined from the 
+output of `trinaryROCRoots()`}
+
+\item{threshHi}{upper threshold value; typically determined from the 
+output of `trinaryROCRoots()`}
+
+\item{rasterOutputPath}{optional file name to write out a raster. If 
+parameter `rModel` is a stack, this can be a vector of names.}
+
+\item{...}{optional arguments to pass to `terra::writeRaster`}
 }
 \value{
 a data.frame

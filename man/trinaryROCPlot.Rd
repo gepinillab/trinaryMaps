@@ -2,24 +2,22 @@
 % Please edit documentation in R/trinaryPlots.r
 \name{trinaryROCPlot}
 \alias{trinaryROCPlot}
-\title{Make Trinary maps from previous workflow runs}
+\title{Plot trinary ROC curve and save the output as pdf file.}
 \usage{
-trinaryROCPlot(
-  ROCPlotFile = NULL,
-  trinaryPlotThings,
-  trinaryDF,
-  openFig = TRUE
-)
+trinaryROCPlot(trinaryPlotThings, trinaryDF, plotFile = NULL, openFig = TRUE)
+}
+\arguments{
+\item{trinaryPlotThings}{Object of trinary ROC curve, contains xx, y, xout, and y. as its attributes.}
+
+\item{trinaryDF}{Data frame with trinary ROC curve information, including youden.thresh.roc.x, hi.thresh.roc.x, lo.thresh.roc.x, and trinary.pauc.}
+
+\item{plotFile}{Path to save the output as pdf file. If NULL, the plot will not be saved.}
+
+\item{openFig}{Logical, if TRUE, the plot will be shown in a new window.}
 }
 \value{
-a data.frame
+None
 }
 \description{
-Read in workflow info, make trinary maps and plot vs thresholds
-}
-\details{
-See Examples.
-}
-\author{
-Cory Merow <cory.merow@gmail.com>
+Plot trinary ROC curve and save the output as pdf file.
 }

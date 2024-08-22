@@ -2,19 +2,23 @@
 % Please edit documentation in R/trinaryUtils.r
 \name{logmod}
 \alias{logmod}
-\title{Make Trinary maps from previous workflow runs}
+\title{Take the logarithm of the absolute value of a number with its sign}
 \usage{
 logmod(x)
 }
+\arguments{
+\item{x}{A numerical input.}
+}
 \value{
-a data.frame
+The result of taking the logarithm of the absolute value of \code{x}
+with its sign.
 }
 \description{
-Read in workflow info, make trinary maps and plot vs thresholds
+This function takes a numerical input \code{x}, computes the logarithm of its
+absolute value and multiplies it by the sign of \code{x}. This ensures that the
+result has the same sign as the input \code{x}.
 }
-\details{
-See Examples.
-}
-\author{
-Cory Merow <cory.merow@gmail.com>
+\examples{
+logmod(10)
+logmod(-5)
 }

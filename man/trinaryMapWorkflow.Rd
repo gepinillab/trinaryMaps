@@ -2,37 +2,48 @@
 % Please edit documentation in R/trinaryWorkflow.r
 \name{trinaryMapWorkflow}
 \alias{trinaryMapWorkflow}
-\title{Apply trinary map tools to a set of continuous range maps}
+\title{Generate trinary maps from species presence, background and model}
 \usage{
 trinaryMapWorkflow(
   pres,
   background,
-  model,
-  modelNames,
-  species,
-  rasterOutputDir = NULL,
-  mapPlotDir = NULL,
-  ROCPlotDir = NULL,
+  rModel,
+  main = NULL,
+  rasterOutputPath = NULL,
+  mapPlotPath = NULL,
+  ROCPlotPath = NULL,
+  maxTPQuantile,
   shapesToPlot = NULL,
-  openFig = T,
+  openFig = TRUE,
   NATo0 = TRUE
 )
 }
 \arguments{
-\item{expertRaster.f=NULL}{}
+\item{pres}{A data.frame object containing the species presence data}
+
+\item{background}{A data.frame object containing the background data}
+
+\item{rModel}{A spatRaster object containing the model data}
+
+\item{main}{An optional title for the main plot}
+
+\item{rasterOutputPath}{A character string specifying the path to save the trinary rasters}
+
+\item{mapPlotPath}{A character string specifying the path to save the trinary map plot}
+
+\item{ROCPlotPath}{A character string specifying the path to save the ROC curve plot}
+
+\item{maxTPQuantile}{A numeric value between 0 and 1 specifying the maximum true positive quantile to use for threshold selection}
+
+\item{shapesToPlot}{A list containing one or more SpatialPolygonsDataFrame objects to overlay on the map plot}
+
+\item{openFig}{A logical indicating whether the generated plots should be displayed in the R console}
+
+\item{NATo0}{A logical indicating whether to turn NA values into zeros in the presence and background data}
 }
 \value{
-a data.frame
+A list containing the trinary thresholds and trinary rasters
 }
 \description{
-Run all aspects of modeling and plotting for a suite of previously run models
-}
-\details{
-See Examples.
-}
-\note{
-This is a convenience wrapper around each component of trinary map building.
-}
-\author{
-Cory Merow <cory.merow@gmail.com>
+This function takes in the species presence and background data, along with a model, and generates trinary maps. It also calculates the range size and plots the maps and ROC curves.
 }

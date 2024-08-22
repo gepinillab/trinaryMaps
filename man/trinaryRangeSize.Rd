@@ -4,10 +4,16 @@
 \alias{trinaryRangeSize}
 \title{Calculate upper and lower limits of range size}
 \usage{
-trinaryRangeSize(trinary.rasters, youden.binary.tmp.raster = NULL)
+trinaryRangeSize(trinaryRasters, otherBinaryRaster = NULL)
 }
 \arguments{
-\item{youden.binary.tmp.raster}{}
+\item{trinaryRasters}{a spatRaster describing a trinary map. It is assumed that 
+values of 0 are absent, values of 1 represent the lower bound, and values 
+of 2 represent the upper bound (e.g., as determined by `trinaryROCRoots`())}
+
+\item{otherBinaryRaster}{optional additional binary raster for which range 
+size is desired. This can be useful, e.g., if you have an additional 
+intermediate threshold of interest (e.g., the max (sensitivity +specificity)).}
 }
 \value{
 a data.frame with the lower, upper, and optimal (Youden threshold) range size

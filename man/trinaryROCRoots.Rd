@@ -4,10 +4,20 @@
 \alias{trinaryROCRoots}
 \title{Find upper/lower thresholds from ROC curves}
 \usage{
-trinaryROCRoots(ins, max.sens = 0.95, smoothMethod = "binormal", ...)
+trinaryROCRoots(
+  ins,
+  max.sens = 0.95,
+  smoothMethod = "binormal",
+  sdMultiplier = 2,
+  maxTPQuantile = 0.3,
+  ...
+)
 }
 \arguments{
-\item{max.sens}{value of sensitivity to use if no upper limit is found based on derviatives. default is 0.95}
+\item{ins}{xxx}
+
+\item{max.sens}{value of sensitivity to use if no upper limit is found based 
+on derviatives. default is 0.95}
 
 \item{smoothMethod}{default is 'binormal'}
 
@@ -17,7 +27,8 @@ trinaryROCRoots(ins, max.sens = 0.95, smoothMethod = "binormal", ...)
 a data.frame
 }
 \description{
-Fit a smoothed ROC curve, find bounds for threshold and report partial AUC statistics
+Fit a smoothed ROC curve, find bounds for threshold and report 
+ partial AUC statistics
 }
 \details{
 See Examples.
