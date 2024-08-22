@@ -21,6 +21,10 @@ on derviatives. default is 0.95}
 
 \item{smoothMethod}{default is 'binormal'}
 
+\item{sdMultiplier}{xxx}
+
+\item{maxTPQuantile}{xxx}
+
 \item{...}{options to be passed to `pROC::smooth`}
 }
 \value{

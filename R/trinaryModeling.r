@@ -11,7 +11,10 @@
 #' @param max.sens value of sensitivity to use if no upper limit is found based 
 #'  on derviatives. default is 0.95
 #' @param smoothMethod default is 'binormal'
+#' @param sdMultiplier xxx
+#' @param maxTPQuantile xxx
 #' @param ... options to be passed to `pROC::smooth`
+#' @importFrom stats approx complete.cases lag quantile sd
 #' @return a data.frame
 #' @author Cory Merow <cory.merow@@gmail.com>
 #' @export
@@ -25,11 +28,11 @@ trinaryROCRoots <- function(ins,
   out <- try({
 	  #== generate a smooth curve so i can take derivatives
 	  a.rough <- pROC::roc(ins[,1], ins[,2], quiet = TRUE)
-	  a <- try(pROC::smooth(a.rough,method=smoothMethod, n=1024,...), silent = TRUE)
+	  a <- try(pROC::smooth(a.rough,method = smoothMethod, n = 1024,...), silent = TRUE)
 	  # i used this default because its the pROC package defualt so i assumed it
 	  # was the best. if it breaks, try the next one test for 'hooked' curved due 
 	  # to a smoothing issue
-	  fail <- ifelse(class(a) == 'try-error', TRUE,
+	  fail <- ifelse(inherits(a) == 'try-error', TRUE,
 	                 any(rev(a$sensitivities) - lag(rev(a$sensitivities)) < 0,
 	                     na.rm = TRUE))
 	  if (fail) { #second case is a known issue from pROC::smooth
@@ -45,7 +48,7 @@ trinaryROCRoots <- function(ins,
 	  youden <- a$specificities + a$sensitivities - 1
 	  best.youden <- which.max(youden)
 	  y.youden <- a$sensitivities[best.youden]
-	  x.youden <- (1-a$specificities)[best.youden]
+	  x.youden <- (1 - a$specificities)[best.youden]
 		#== take the smallest value above the threshold. this ensures that you 
 	  #== choose an actual threshold (and not -Inf) if the AUC is perfect
 	  threshYouden <- rev(a.rough$thresholds)[(findInterval(x.youden, 
@@ -231,7 +234,7 @@ trinaryROCRoots <- function(ins,
 	                        partial.auc.correct = TRUE, quiet = TRUE,
 	                        smoothMethod = smoothMethod), silent = TRUE)
 	# try different smooth method if it breaks
-	if (class(a.pauc) == 'try-error') {
+	if (inherits(a.pauc) == 'try-error') {
 	  a.pauc <- try(pROC::roc(ins[,1], ins[,2], auc = TRUE,
 	                          partial.auc = 1 - c(x.lo, x.as), 
 	                          partial.auc.focus = 'specificity', 

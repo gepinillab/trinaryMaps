@@ -58,7 +58,7 @@ trinaryMapWorkflow <- function(pres,
 
 	#== fit auc curves
 	threshs <- tryCatch(trinaryROCRoots(ins = ins), error = function(e) e)
-	if (class(threshs) == 'try-error') {
+	if (inherits(threshs) == 'try-error') {
 		message(paste0("Couldn't find roots of the ROC curve; this often happens if ",
 		               "you have  very few presence or background points. So you're ",
 		               "not getting any trinary maps."))

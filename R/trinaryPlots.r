@@ -7,6 +7,7 @@
 #' @param trinaryDF Data frame with trinary ROC curve information, including youden.thresh.roc.x, hi.thresh.roc.x, lo.thresh.roc.x, and trinary.pauc.
 #' @param plotFile Path to save the output as pdf file. If NULL, the plot will not be saved.
 #' @param openFig Logical, if TRUE, the plot will be shown in a new window.
+#' @importFrom graphics abline par points text
 #' @return None
 
 #' @export
