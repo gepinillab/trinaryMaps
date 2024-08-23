@@ -42,6 +42,8 @@ trinaryMapWorkflow <- function(pres,
 
 	p <- terra::extract(rModel, pres, ID = FALSE)
 	a <- terra::extract(rModel, background, ID = FALSE)
+	p <- p[, 1]
+	a <- a[, 1]
 	# optionally turn NA into zeros so they contribute to getting absences right. 
 	# i chose to do this because bg from neightboring ecoregions are considered 
 	# absences for this evaluation
@@ -51,20 +53,19 @@ trinaryMapWorkflow <- function(pres,
 	}
 	p <- stats::na.omit(p)
 	a <- stats::na.omit(a)
-	message(paste0(nrow(p), ' presences and ', nrow(a), 
+	message(paste0(length(p), ' presences and ', length(a), 
 	               ' background points used for building trinary maps'))
 	ins <- rbind(data.frame(Y = 1, X = p),
 	             data.frame(Y = 0, X = a))
-
+	print(ins)
 	#== fit auc curves
 	threshs <- tryCatch(trinaryROCRoots(ins = ins), error = function(e) e)
-	if (inherits(threshs) == 'try-error') {
+	if (inherits(threshs, 'try-error')) {
 		message(paste0("Couldn't find roots of the ROC curve; this often happens if ",
 		               "you have  very few presence or background points. So you're ",
 		               "not getting any trinary maps."))
 		return(list(threshs = NULL, trinary.rasters = NULL))
 	}
-	
 	#== make maps
 	trinary.rasters <- trinaryMap(rModel,
 														    threshLo = threshs[[1]]$threshLo,

@@ -45,7 +45,7 @@ trinaryROCRoots <- function(ins,
 	  # i used this default because its the pROC package defualt so i assumed it
 	  # was the best. if it breaks, try the next one test for 'hooked' curved due 
 	  # to a smoothing issue
-	  fail <- ifelse(inherits(a) == 'try-error', TRUE,
+	  fail <- ifelse(inherits(a, 'try-error'), TRUE,
 	                 any(rev(a$sensitivities) - lag(rev(a$sensitivities)) < 0,
 	                     na.rm = TRUE))
 	  if (fail) { #second case is a known issue from pROC::smooth
@@ -56,7 +56,6 @@ trinaryROCRoots <- function(ins,
 		                 "you're unhappy about this, see other options for ",
 		                 "methods in ?pROC::smooth."))
 	  }
-	
 	  #== youden index 
 	  youden <- a$specificities + a$sensitivities - 1
 	  best.youden <- which.max(youden)
@@ -66,11 +65,9 @@ trinaryROCRoots <- function(ins,
 	  #== choose an actual threshold (and not -Inf) if the AUC is perfect
 	  threshYouden <- rev(a.rough$thresholds)[(findInterval(x.youden, 
 	                                                        rev(1 - a.rough$specificities)) + 1)]
-	  
 	  #== coords for ROC 
 	  xx <- rev(1-a$specificities)
 	  y <- rev(a$sensitivities)
-	
 	  #== catch failed derivatives and use a special case
 	  if (a.rough$auc > .999) {
 		  message(paste0("The AUC is too close to 1 to take the derivatives needed ",
@@ -81,13 +78,12 @@ trinaryROCRoots <- function(ins,
 		                 "was still calculated as usual, but note that it may not be ",
 		                 "between these upper and lower bounds for very small sample ",
 		                 "sizes.")
-		    )
-
+		    )}
 		#== prep outputs
 		#== make the low value the minimum value at a predicted presence - 2sd (since 
 	  #== smale sample sizes end up just predicting the presence points are the 
 	  #== only places occupied). 2 sd chosen because ...
-		sd1 <- sd(ins$X[ins$Y==1])
+	  sd1 <- sd(ins$X[ins$Y==1])
 		threshLo <- min(ins$X[ins$Y==1]) - sdMultiplier * sd1
 		if (threshLo < 0) {
 			message(paste0("The value of `sdMultiplier` you used lead to a negative ",
@@ -97,7 +93,6 @@ trinaryROCRoots <- function(ins,
 		}
 		lo.thresh.roc.x <- (sum(ins$X[ins$Y == 0] >= threshLo) / length(ins$X[ins$Y == 0]))
 		lo.thresh.roc.y <- 1
-		
 		#== make the hi value the .3 quantile of predicted presence, cuz you'd never 
 		#== want a model with <70% sensitivity
 		threshHi <- quantile(ins$X[ins$Y == 1], maxTPQuantile)
@@ -118,10 +113,10 @@ trinaryROCRoots <- function(ins,
 										   y.lo.inv = NA,
 										   x.lo.inv = NA,
 										   trinary.pauc = as.numeric(a.rough$auc))
-	  plotThings <- list(xx = xx, y = y, y. = NULL, y.. = NULL, xx1 = NULL,
+		plotThings <- list(xx = xx, y = y, y. = NULL, y.. = NULL, xx1 = NULL,
 	                     y1 = NULL, y1.. = NULL, xout = NULL, x1out = NULL)
 		return(list(trinaryDF = out1, plotThings = plotThings))
-	}
+	})
 	
 	#== derivatives
 	xx. <-  .middle_pts(xx)
@@ -247,13 +242,13 @@ trinaryROCRoots <- function(ins,
 	                        partial.auc.correct = TRUE, quiet = TRUE,
 	                        smoothMethod = smoothMethod), silent = TRUE)
 	# try different smooth method if it breaks
-	if (inherits(a.pauc) == 'try-error') {
+	if (inherits(a.pauc, 'try-error')) {
 	  a.pauc <- try(pROC::roc(ins[,1], ins[,2], auc = TRUE,
 	                          partial.auc = 1 - c(x.lo, x.as), 
 	                          partial.auc.focus = 'specificity', 
 	                          partial.auc.correct = TRUE, smooth.method = 'density',
 	                          quiet = TRUE), silent = TRUE)
-	  }
+	}
 	#if(class(a.pauc)=='try-error') a.pauc=list(auc=NA)
 	
 	#== find thresholds 
@@ -289,8 +284,6 @@ trinaryROCRoots <- function(ins,
 	                xout=xout,x1out=x1out)
 	
 	list(trinaryDF=out1,plotThings=plotThings)
-	
-	}) 
 	return(out)
 }
 
@@ -309,7 +302,6 @@ trinaryROCRoots <- function(ins,
 #' output of `trinaryROCRoots()`
 #' @param rasterOutputPath optional file name to write out a raster.
 #' @param ... optional arguments to pass to `terra::writeRaster`
-#' @details
 #' @return a data.frame
 #' @author Cory Merow <cory.merow@@gmail.com>
 #' @export
