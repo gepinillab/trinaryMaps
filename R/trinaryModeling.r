@@ -355,19 +355,45 @@ trinaryMap <- function(rModel,
 #' @return a data.frame with the lower, upper, and optimal (Youden threshold) range size
 #' @author Cory Merow <cory.merow@@gmail.com>
 #' @export
-trinaryRangeSize <-  function(trinaryRasters,
-                              otherBinaryRaster = NULL) {
+trinaryRangeSize <- function(trinaryRasters,
+                             otherBinaryRaster = NULL) {
   
-  cell.size <- prod(terra::res(trinaryRasters) / 1e3)
-	
-	range.size <-  cell.size * data.frame( 
-				range.size.lo.km2 = sum(terra::values(trinaryRasters) > 1, na.rm = TRUE),
-	 			range.size.hi.km2 = sum(terra::values(trinaryRasters) > 0, na.rm = TRUE),
-	 			range.size.youden.km2 = ifelse(!is.null(otherBinaryRaster), 
-	 			                               sum(terra::values(otherBinaryRaster) > 0,
-	 			                                   na.rm = TRUE), NA))
-	return(range.size)
+  # Check if trinaryRasters is a SpatRaster
+  if (!inherits(trinaryRasters, "SpatRaster")) {
+    stop("Error: trinaryRasters must be a SpatRaster object.")
+  }
+  
+  # Check if trinaryRasters contains only values 0, 1, or 2
+  unique_values <- unique(terra::values(trinaryRasters))
+  if (!all(unique_values %in% c(0, 1, 2, NA))) {
+    stop("Error: trinaryRasters must contain only values of 0, 1, or 2.")
+  }
+  
+  # Calculate the area by value
+  r_size <- terra::expanse(trinaryRasters, byValue = TRUE, unit = "km")
+  print(r_size)
+  # Initialize the range.size data frame with NA values
+  range.size <- data.frame(
+    range.size.lo.km2 = NA,
+    range.size.hi.km2 = NA,
+    range.size.other.km2 = ifelse(!is.null(otherBinaryRaster), 
+                                  sum(terra::values(otherBinaryRaster) > 0, 
+                                      na.rm = TRUE), NA)
+  )
+  
+  # Assign values if they exist in r_size
+  if (2 %in% r_size[, "value"]) {
+    range.size$range.size.hi.km2 <- r_size[r_size[, "value"] == 2, "area"]
+  }
+  if (1 %in% r_size[, "value"]) {
+    range.size$range.size.lo.km2 <- r_size[r_size[, "value"] == 1, "area"]
+    if (!is.na(range.size$range.size.hi.km2)) {
+      range.size$range.size.lo.km2 <- range.size$range.size.hi.km2 + range.size$range.size.lo.km2
+    }
+  }
+  return(range.size)
 }
+
 	
 
 
