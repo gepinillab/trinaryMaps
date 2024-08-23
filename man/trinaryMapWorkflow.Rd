@@ -4,19 +4,7 @@
 \alias{trinaryMapWorkflow}
 \title{Generate trinary maps from species presence, background and model}
 \usage{
-trinaryMapWorkflow(
-  pres,
-  background,
-  rModel,
-  main = NULL,
-  rasterOutputPath = NULL,
-  mapPlotPath = NULL,
-  ROCPlotPath = NULL,
-  maxTPQuantile,
-  shapesToPlot = NULL,
-  openFig = TRUE,
-  NATo0 = TRUE
-)
+trinaryMapWorkflow(pres, background, rModel, NATo0 = TRUE)
 }
 \arguments{
 \item{pres}{A data.frame object containing the species presence data}
@@ -24,20 +12,6 @@ trinaryMapWorkflow(
 \item{background}{A data.frame object containing the background data}
 
 \item{rModel}{A spatRaster object containing the model data}
-
-\item{main}{An optional title for the main plot}
-
-\item{rasterOutputPath}{A character string specifying the path to save the trinary rasters}
-
-\item{mapPlotPath}{A character string specifying the path to save the trinary map plot}
-
-\item{ROCPlotPath}{A character string specifying the path to save the ROC curve plot}
-
-\item{maxTPQuantile}{A numeric value between 0 and 1 specifying the maximum true positive quantile to use for threshold selection}
-
-\item{shapesToPlot}{A list containing one or more SpatialPolygonsDataFrame objects to overlay on the map plot}
-
-\item{openFig}{A logical indicating whether the generated plots should be displayed in the R console}
 
 \item{NATo0}{A logical indicating whether to turn NA values into zeros in the presence and background data}
 }

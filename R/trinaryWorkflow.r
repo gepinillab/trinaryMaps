@@ -8,38 +8,15 @@
 #' @param pres A data.frame object containing the species presence data
 #' @param background A data.frame object containing the background data
 #' @param rModel A spatRaster object containing the model data
-#' @param main An optional title for the main plot
-#' @param rasterOutputPath A character string specifying the path to save the trinary rasters
-#' @param mapPlotPath A character string specifying the path to save the trinary map plot
-#' @param ROCPlotPath A character string specifying the path to save the ROC curve plot
-#' @param maxTPQuantile A numeric value between 0 and 1 specifying the maximum true positive quantile to use for threshold selection
-#' @param shapesToPlot A list containing one or more SpatialPolygonsDataFrame objects to overlay on the map plot
-#' @param openFig A logical indicating whether the generated plots should be displayed in the R console
 #' @param NATo0 A logical indicating whether to turn NA values into zeros in the presence and background data
-#'
 #' @return A list containing the trinary thresholds and trinary rasters
 #'
 #' @export
 trinaryMapWorkflow <- function(pres,
 													     background,
 													     rModel,
-													     main = NULL,
-													     #modelNames,
-													     #species,
-													     #rasterOutputDir=NULL,
-													     #mapPlotDir=NULL,
-													     #ROCPlotDir=NULL,
-													     rasterOutputPath = NULL,
-													     mapPlotPath = NULL,
-													     ROCPlotPath = NULL,
-													     maxTPQuantile,
-													     shapesToPlot = NULL,
-													     openFig = TRUE,
 													     NATo0 = TRUE) {
 	
-	#  for testing
-	#  background=bg1; ROCPlotDir=mapPlotDir
-
 	p <- terra::extract(rModel, pres, ID = FALSE)
 	a <- terra::extract(rModel, background, ID = FALSE)
 	p <- p[, 1]
@@ -69,18 +46,9 @@ trinaryMapWorkflow <- function(pres,
 	trinary.rasters <- trinaryMap(rModel,
 														    threshLo = threshs[[1]]$threshLo,
 														    threshHi = threshs[[1]]$threshHi,
-														    rasterOutputPath = rasterOutputPath,
 														    overwrite = TRUE, format = "GTiff",
 												 		    datatype = "INT1U", 
 														    options = c("COMPRESS=DEFLATE"))
-	#== calculate stats
-	range.size <- trinaryRangeSize(trinary.rasters, rModel > threshs[[1]]$threshYouden)
-	if (!is.null(ROCPlotPath)) {
-	  trinaryROCPlot(trinaryPlotThings = threshs$plotThings,
-	                 trinaryDF = threshs$trinaryDF,
-	                 plotFile = ROCPlotPath,
-	                 openFig = openFig)
-	}
 	return(list(threshs = threshs, 
 	            trinary.rasters = trinary.rasters))
 }
