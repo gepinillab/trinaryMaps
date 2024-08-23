@@ -37,17 +37,20 @@ trinaryROCRoots <- function(ins,
  												    sdMultiplier = 2,
  												    maxTPQuantile = .3,
  												    ...) {
-  
   out <- try({
-	  #== generate a smooth curve so i can take derivatives
+	  print(0)
+    #== generate a smooth curve so i can take derivatives
 	  a.rough <- pROC::roc(ins[,1], ins[,2], quiet = TRUE)
+	  print(1)
 	  a <- try(pROC::smooth(a.rough,method = smoothMethod, n = 1024,...), silent = TRUE)
+	  print(2)
 	  # i used this default because its the pROC package defualt so i assumed it
 	  # was the best. if it breaks, try the next one test for 'hooked' curved due 
 	  # to a smoothing issue
 	  fail <- ifelse(inherits(a, 'try-error'), TRUE,
 	                 any(rev(a$sensitivities) - lag(rev(a$sensitivities)) < 0,
 	                     na.rm = TRUE))
+	  print(3)
 	  if (fail) { #second case is a known issue from pROC::smooth
 		  smoothMethod = 'density' # ensures its used below too
 		  a = pROC::smooth(a.rough,method = smoothMethod, ...)
@@ -56,6 +59,7 @@ trinaryROCRoots <- function(ins,
 		                 "you're unhappy about this, see other options for ",
 		                 "methods in ?pROC::smooth."))
 	  }
+	  print(4)
 	  #== youden index 
 	  youden <- a$specificities + a$sensitivities - 1
 	  best.youden <- which.max(youden)
@@ -69,16 +73,16 @@ trinaryROCRoots <- function(ins,
 	  xx <- rev(1-a$specificities)
 	  y <- rev(a$sensitivities)
 	  #== catch failed derivatives and use a special case
+	  print(5)
 	  if (a.rough$auc > .999) {
-		  message(paste0("The AUC is too close to 1 to take the derivatives needed ",
+	    message(paste0("The AUC is too close to 1 to take the derivatives needed ",
 		                 "to find   reasonable trinary thresholds. Returning results ",
 		                 "using the minimum predicted value at training presence as ", 
 		                 "the lower threshold and the 30% training presence quantile",
 		                 " as the upper threshold. The max(sensitivity+specificity)) ",
 		                 "was still calculated as usual, but note that it may not be ",
 		                 "between these upper and lower bounds for very small sample ",
-		                 "sizes.")
-		    )}
+		                 "sizes."))
 		#== prep outputs
 		#== make the low value the minimum value at a predicted presence - 2sd (since 
 	  #== smale sample sizes end up just predicting the presence points are the 
@@ -116,8 +120,8 @@ trinaryROCRoots <- function(ins,
 		plotThings <- list(xx = xx, y = y, y. = NULL, y.. = NULL, xx1 = NULL,
 	                     y1 = NULL, y1.. = NULL, xout = NULL, x1out = NULL)
 		return(list(trinaryDF = out1, plotThings = plotThings))
-	})
-	
+	}
+	  print(6)
 	#== derivatives
 	xx. <-  .middle_pts(xx)
 	xx.. <-  .middle_pts(.middle_pts(xx))
@@ -127,14 +131,14 @@ trinaryROCRoots <- function(ins,
 	y..r <- .deriv(xx., y.r)
 	y...r <- .deriv(xx.., y..r)
 	y....r <- .deriv(xx..., y...r)
-	
+	print(7)
 	#== make the derivatives real functions so they can be evaluated at the x points (e.g. for curvature)
 	xout=seq(0,1,length=200) 
 	y.=suppressWarnings(approx(xx.,y.r,xout=xout,method='linear')$y)
 	y..=try(approx(xx..,y..r,xout=xout,method='linear')$y,silent=TRUE)
 	y...=try(approx(xx...,y...r,xout=xout)$y,silent=TRUE)
 	y....=try(approx(.middle_pts(xx...),y....r,xout=xout)$y,silent=TRUE)
-	
+	print(8)
 	#== remove NAs 
 	keep=complete.cases(y..r)
 	y..1=y..r[keep]
@@ -146,7 +150,7 @@ trinaryROCRoots <- function(ins,
 	#-- remove  nans
 	switches[which(switches==length(y..1))]=NA
 	switches=stats::na.omit(switches)
-	
+	print(9)
 		#-- since y is evaluated at the midpoint of the xs get the midpoint...
 	if(length(switches)>0 & any(switches>best.youden)){
 		x.as=(xx..1[switches]+xx..1[switches+1])/2
@@ -172,7 +176,7 @@ trinaryROCRoots <- function(ins,
 		not.root.index=findInterval(max.sens,y)
 		x.as=xx[not.root.index]
 	}
-
+	print(10)
 	#== prep for COR (inverse ROC) to find asymptote
 	y1=1-xx
 	xx1=1-y # plot(xx,y,type='l'); plot(xx1,y1,type='l')
@@ -190,7 +194,10 @@ trinaryROCRoots <- function(ins,
 	  # witches will be introduced. also doesn't like Infs, so replacing them with
 	  # the largest/smallest numbers
 	y1..r=ifelse(is.nan(y1..r),stats::lag(y1..r,1),y1..r)
+	print(11)
+	print(y1..r)
 	while(any(is.nan(y1..r))){ y1..r=ifelse(is.nan(y1..r),lag(y1..r,1),y1..r) }
+	print(12)
 	y1..r[y1..r==-Inf]=.Machine$double.xmin
 	y1..r[y1..r==Inf]=.Machine$double.xmax
 	# 	check result
@@ -234,13 +241,14 @@ trinaryROCRoots <- function(ins,
 	
 	x.lo=1-y.lo.inv
 	y.lo=1-x.lo.inv
-
+  print(7)
 	# this smoothing is just used to get the value of the pAUC, not the actual thresholds
 	a.pauc <- try(pROC::roc(ins[,1], ins[,2], auc = TRUE, 
 	                        partial.auc = 1 - c(x.lo, x.as), 
 	                        partial.auc.focus = 'specificity', 
 	                        partial.auc.correct = TRUE, quiet = TRUE,
 	                        smoothMethod = smoothMethod), silent = TRUE)
+	print(8)
 	# try different smooth method if it breaks
 	if (inherits(a.pauc, 'try-error')) {
 	  a.pauc <- try(pROC::roc(ins[,1], ins[,2], auc = TRUE,
@@ -249,6 +257,7 @@ trinaryROCRoots <- function(ins,
 	                          partial.auc.correct = TRUE, smooth.method = 'density',
 	                          quiet = TRUE), silent = TRUE)
 	}
+	print(9)
 	#if(class(a.pauc)=='try-error') a.pauc=list(auc=NA)
 	
 	#== find thresholds 
@@ -284,6 +293,7 @@ trinaryROCRoots <- function(ins,
 	                xout=xout,x1out=x1out)
 	
 	list(trinaryDF=out1,plotThings=plotThings)
+  })
 	return(out)
 }
 

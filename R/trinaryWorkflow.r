@@ -57,7 +57,6 @@ trinaryMapWorkflow <- function(pres,
 	               ' background points used for building trinary maps'))
 	ins <- rbind(data.frame(Y = 1, X = p),
 	             data.frame(Y = 0, X = a))
-	print(ins)
 	#== fit auc curves
 	threshs <- tryCatch(trinaryROCRoots(ins = ins), error = function(e) e)
 	if (inherits(threshs, 'try-error')) {
@@ -74,10 +73,8 @@ trinaryMapWorkflow <- function(pres,
 														    overwrite = TRUE, format = "GTiff",
 												 		    datatype = "INT1U", 
 														    options = c("COMPRESS=DEFLATE"))
-								
 	#== calculate stats
 	range.size <- trinaryRangeSize(trinary.rasters, rModel > threshs[[1]]$threshYouden)
-	
 	if (!is.null(ROCPlotPath)) {
 	  trinaryROCPlot(trinaryPlotThings = threshs$plotThings,
 	                 trinaryDF = threshs$trinaryDF,
