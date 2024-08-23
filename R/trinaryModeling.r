@@ -7,12 +7,25 @@
 #'  partial AUC statistics
 #' @details
 #' See Examples.
-#' @param ins xxx
+#' @param ins A data frame where the first column contains the the observed 
+#' binary outcomes (e.g., 0 for absence and 1 for presence) and the second column 
+#' contains predictor values (e.g., predicted probabilities/suitability). This 
+#' input is used to calculate the ROC curve, derive thresholds, and assess model 
+#' performance.
+#' @param maxTPQuantile A numeric value representing the quantile of the predicted 
+#' values at presence locations used to determine the upper threshold for 
+#' presence predictions. For example, a value of `0.3` means the function 
+#' uses the 30th percentile of the predicted presence values as the upper 
+#' threshold, ensuring that the model maintains at least 70% 
+#' sensitivity. Default is `0.3`.
+#' @param sdMultiplier A numeric value that controls the adjustment of the lower 
+#' threshold for presence predictions. It multiplies the standard deviation of 
+#' the predicted values at presence locations to define this lower threshold. 
+#' If this threshold results in a negative value, it is adjusted to zero 
+#' by default. Default is `2`.
 #' @param max.sens value of sensitivity to use if no upper limit is found based 
-#'  on derviatives. default is 0.95
+#'  on derivatives. default is 0.95
 #' @param smoothMethod default is 'binormal'
-#' @param sdMultiplier xxx
-#' @param maxTPQuantile xxx
 #' @param ... options to be passed to `pROC::smooth`
 #' @importFrom stats approx complete.cases lag quantile sd
 #' @return a data.frame
@@ -294,22 +307,11 @@ trinaryROCRoots <- function(ins,
 #' output of `trinaryROCRoots()`
 #' @param threshHi upper threshold value; typically determined from the 
 #' output of `trinaryROCRoots()`
-#' @param rasterOutputPath optional file name to write out a raster. If 
-#' parameter `rModel` is a stack, this can be a vector of names.
+#' @param rasterOutputPath optional file name to write out a raster.
 #' @param ... optional arguments to pass to `terra::writeRaster`
 #' @details
-#' See Examples.
-#'
-# @keywords
-#'
-# @examples
-#'
-#'
 #' @return a data.frame
 #' @author Cory Merow <cory.merow@@gmail.com>
-
-
-
 #' @export
 
 # should add the option to use a map in memory
@@ -350,12 +352,7 @@ trinaryMap <- function(rModel,
 #################################################################
 #################################################################
 #' @title Calculate upper and lower limits of range size
-#'
 #' @description Size limits based on trinary thresholds
-#'
-#' @details
-#' See Examples.
-#'
 #' @param trinaryRasters a spatRaster describing a trinary map. It is assumed that 
 #'  values of 0 are absent, values of 1 represent the lower bound, and values 
 #'  of 2 represent the upper bound (e.g., as determined by `trinaryROCRoots`())
@@ -364,7 +361,6 @@ trinaryMap <- function(rModel,
 #'  intermediate threshold of interest (e.g., the max (sensitivity +specificity)).
 #' @return a data.frame with the lower, upper, and optimal (Youden threshold) range size
 #' @author Cory Merow <cory.merow@@gmail.com>
-
 #' @export
 trinaryRangeSize <-  function(trinaryRasters,
                               otherBinaryRaster = NULL) {

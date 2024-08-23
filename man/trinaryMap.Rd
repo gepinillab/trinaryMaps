@@ -15,8 +15,7 @@ output of `trinaryROCRoots()`}
 \item{threshHi}{upper threshold value; typically determined from the 
 output of `trinaryROCRoots()`}
 
-\item{rasterOutputPath}{optional file name to write out a raster. If 
-parameter `rModel` is a stack, this can be a vector of names.}
+\item{rasterOutputPath}{optional file name to write out a raster.}
 
 \item{...}{optional arguments to pass to `terra::writeRaster`}
 }
@@ -25,9 +24,6 @@ a data.frame
 }
 \description{
 Use previously calculated thresholds to make trinary maps
-}
-\details{
-See Examples.
 }
 \author{
 Cory Merow <cory.merow@gmail.com>

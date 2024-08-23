@@ -21,9 +21,6 @@ a data.frame with the lower, upper, and optimal (Youden threshold) range size
 \description{
 Size limits based on trinary thresholds
 }
-\details{
-See Examples.
-}
 \author{
 Cory Merow <cory.merow@gmail.com>
 }

@@ -14,16 +14,29 @@ trinaryROCRoots(
 )
 }
 \arguments{
-\item{ins}{xxx}
+\item{ins}{A data frame where the first column contains the the observed 
+binary outcomes (e.g., 0 for absence and 1 for presence) and the second column 
+contains predictor values (e.g., predicted probabilities/suitability). This 
+input is used to calculate the ROC curve, derive thresholds, and assess model 
+performance.}
 
 \item{max.sens}{value of sensitivity to use if no upper limit is found based 
-on derviatives. default is 0.95}
+on derivatives. default is 0.95}
 
 \item{smoothMethod}{default is 'binormal'}
 
-\item{sdMultiplier}{xxx}
+\item{sdMultiplier}{A numeric value that controls the adjustment of the lower 
+threshold for presence predictions. It multiplies the standard deviation of 
+the predicted values at presence locations to define this lower threshold. 
+If this threshold results in a negative value, it is adjusted to zero 
+by default. Default is `2`.}
 
-\item{maxTPQuantile}{xxx}
+\item{maxTPQuantile}{A numeric value representing the quantile of the predicted 
+values at presence locations used to determine the upper threshold for 
+presence predictions. For example, a value of `0.3` means the function 
+uses the 30th percentile of the predicted presence values as the upper 
+threshold, ensuring that the model maintains at least 70% 
+sensitivity. Default is `0.3`.}
 
 \item{...}{options to be passed to `pROC::smooth`}
 }
