@@ -22,24 +22,64 @@ Building trinary maps involves the same inputs as one would use for binary class
 2. Occurrences coordinates (data.frame)
 3. Background coordinates (data.frame)
 
-A single call will get you the full set of outputs, if you don't need to customize settings. This will:
-1. Calculate upper and lower threshold bounds
-2. Make trinary map based on these bounds
-3. Calculate range sizes associated with generated trinary map
-4. Plot the ROC curve with upper and lower threshold bounds
+# Basic Workflow
+The `trinaryMapWorkflow()` function is the main entry point for using the package. It performs the following steps:
+1. Calculates upper and lower threshold bounds
+2. Creates a trinary map based on these bounds
+3. Calculates range sizes associated with the generated trinary map
+Plots the ROC curve with upper and lower threshold bounds
+
+Here's an example of how to use the trinaryMapWorkflow function:
 
 ```{r}
-# presence, background and model for demos are included with the packs
-pres=
-bg=
-model=
-trinaryMapWorkflow(pres=pres, background=bg,model=model,
-                   modelNames=modelNames,main=species,
-                   rasterOutputDir=rasterOutputDir,
-                   mapPlotDir=mapPlotDir, 
-                   shapesToPlot=shapesToPlot,openFig=openFig,
-                   ROCPlotDir=ROCPlotDir, 
-                   doMapPlot=doMapPlot,doROCPlot=doROCPlot)
+library(trinaryMaps)
+library(maxnet)
+library(predicts)
+library(terra)
+
+# Load example data
+occurence <- system.file("/ex/bradypus.csv", package = "predicts")
+occ <- read.csv(occurence)[, -1]
+f <- system.file("ex/bio.tif", package="predicts")
+envs <- terra::rast(f)
+
+# Prepare data for modeling
+data <- terra::values(envs) |> as.data.frame()
+data$ID <- 1:(terra::nrow(envs) * terra::ncol(envs))
+occs.p <- terra::extract(envs, occ, cells = TRUE)
+data$p <- rep(0, terra::ncell(envs))
+data$p[occs.p$cell] <- 1
+data$x <- terra::xFromCell(envs, 1:terra::ncell(envs))
+data$y <- terra::yFromCell(envs, 1:terra::ncell(envs))
+data <- na.omit(data)
+
+# Build and predict model
+mod <- maxnet(data$p, data[, 1:9])
+p.vals <- predict(mod, terra::values(envs), type = "cloglog")
+suitability <- rep(NA, terra::ncell(envs))
+suitability[data$ID] <- p.vals
+r <- envs[[1]]
+names(r) <- "suitability"
+terra::values(r) <- suitability
+
+# Run trinaryMapWorkflow
+tr <- trinaryMapWorkflow(pres = data[data$p == 1, c("x", "y")], 
+                         background = data[data$p == 0, c("x", "y")], 
+                         rModel = r)
+```
+
+```{r}
+# Plot trinary map
+plot(tr$trinary.rasters)
+```
+
+```{r}
+# Area
+trinaryRangeSize(tr$trinary.rasters)
+```
+
+```{r}
+trinaryROCPlot(tr$threshs$plotThings, trinaryDF = tr$threshs$trinaryDF)
 ```
 
 There are also functions that allow you to interact with each of the 5 steps above rather than calling them all at once, in case customization is needed.
