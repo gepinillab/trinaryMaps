@@ -67,19 +67,36 @@ tr <- trinaryMapWorkflow(pres = data[data$p == 1, c("x", "y")],
                          background = data[data$p == 0, c("x", "y")], 
                          rModel = r)
 ```
-
+## Plotting the Trinary Map
+The trinary map is a categorical map that has been transformed into three classes based on the upper and lower thresholds calculated by the `trinaryMapWorkflow()` function. This plot provides a visual representation of where the three classes occur. Class 0 corresponds to pixels with values below the lower bound threshold (definitely unoccupied habitat), class 1 correspond to pixels greater or equal to the lower bound threshold but less than the upper bound threshold (marginal, occasional, or uncertain occupied habitat), and class 2 denotes pixels with values above the upper bound threshold (likely occupied habitat).
 ```{r}
-# Plot trinary map
 plot(tr$trinary.rasters)
+points(occ)
 ```
-
+This chunk calculates the range sizes associated with each threshold value in the trinary map. The range size is an important metric that can be used to understand the sensitivity and specificity of the model predictions at different threshold values.
 ```{r}
 # Area
 trinaryRangeSize(tr$trinary.rasters)
 ```
 
+# Trinary Map ROC Plots
+The function `trinaryROCPlot()` generates five ROC plots that help determine the lower and upper bound thresholds. These plots facilitate understanding of how the trinary map is constructed.
+
+## ROC
+This plot shows the smoothed ROC curve by binormal or density smoothing. The red dot marks the location of the **lower bound threshold**, which represents the minimum sensitivity and maximum specificity value. The yellow dot indicates the **youden threshold**, corresponding to the maximum sum of sensitivity and specificity values. The blue dot marks the **upper bound threshold**, which represents the maximum sensitivity and the minimum value on specificity.
+
+## ROC': First Derivative
+The first derivative of the smoothed ROC curve is shown here. This plot helps identify the point on the ROC curve where the trade-off between true positive rates and false positive rates is optimized. Note that the **youden threshold** corresponds to the root.
+
+## logmod(ROC''): Logmod of Second Derivative
+This plot displays the second derivative of the smoothed ROC curve after applying a logmod transformation. It helps to identify the **upper bound threshold** (blue).
+
+## Inverted ROC
+To calculate the upper bound threshold, the horizontal and vertical axes are inverted in this plot. This results in an "inverted ROC" curve where high specificity values correspond to low true positive rates, and vice versa. 
+
+## logmod(Inverted ROC)
+The second derivative of the inverted ROC curve is calculated after applying a logmod transformation. The red dot marks the **lower bound threshold**.
 ```{r}
 trinaryROCPlot(tr$threshs$plotThings, trinaryDF = tr$threshs$trinaryDF)
 ```
-
 There are also functions that allow you to interact with each of the 5 steps above rather than calling them all at once, in case customization is needed.
