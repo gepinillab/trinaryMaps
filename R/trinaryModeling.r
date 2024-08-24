@@ -48,8 +48,8 @@ trinaryROCRoots <- function(ins,
 	                 any(rev(a$sensitivities) - lag(rev(a$sensitivities)) < 0,
 	                     na.rm = TRUE))
 	  if (fail) { #second case is a known issue from pROC::smooth
-		  smoothMethod = 'density' # ensures its used below too
-		  a = pROC::smooth(a.rough,method = smoothMethod, ...)
+		  smoothMethod <- 'density' # ensures its used below too
+		  a <- pROC::smooth(a.rough,method = smoothMethod, ...)
 		  message(paste0("Used method=density for ROC smoothing because your ",
 		                 "selected method (set by argument smoothMethod) broke. If ",
 		                 "you're unhappy about this, see other options for ",
@@ -65,7 +65,7 @@ trinaryROCRoots <- function(ins,
 	  threshYouden <- rev(a.rough$thresholds)[(findInterval(x.youden, 
 	                                                        rev(1 - a.rough$specificities)) + 1)]
 	  #== coords for ROC 
-	  xx <- rev(1-a$specificities)
+	  xx <- rev(1 - a$specificities)
 	  y <- rev(a$sensitivities)
 	  #== catch failed derivatives and use a special case
 	  if (a.rough$auc > .999) {
@@ -111,69 +111,67 @@ trinaryROCRoots <- function(ins,
 										   y.lo.inv = NA,
 										   x.lo.inv = NA,
 										   trinary.pauc = as.numeric(a.rough$auc))
-		plotThings <- list(xx = xx, y = y, y. = NULL, y.. = NULL, xx1 = NULL,
+		plotThings <- list(xx = xx, y = y, y. = NULL, y.. = NULL, 
 	                     y1 = NULL, y1.. = NULL, xout = NULL, x1out = NULL)
 		return(list(trinaryDF = out1, plotThings = plotThings))
 	}
 	#== derivatives
-	xx. <-  .middle_pts(xx)
-	xx.. <-  .middle_pts(.middle_pts(xx))
-	xx... <-  .middle_pts(.middle_pts(.middle_pts(xx)))
+	xx. <- .middle_pts(xx)
+	xx.. <- .middle_pts(.middle_pts(xx))
+	xx... <- .middle_pts(.middle_pts(.middle_pts(xx)))
 
 	y.r <- .deriv(xx, y)
 	y..r <- .deriv(xx., y.r)
 	y...r <- .deriv(xx.., y..r)
 	y....r <- .deriv(xx..., y...r)
 	#== make the derivatives real functions so they can be evaluated at the x points (e.g. for curvature)
-	xout=seq(0,1,length=200) 
-	y.=suppressWarnings(approx(xx.,y.r,xout=xout,method='linear')$y)
-	y..=try(approx(xx..,y..r,xout=xout,method='linear')$y,silent=TRUE)
-	y...=try(approx(xx...,y...r,xout=xout)$y,silent=TRUE)
-	y....=try(approx(.middle_pts(xx...),y....r,xout=xout)$y,silent=TRUE)
+	xout <- seq(0, 1, length = 200) 
+	y. <- suppressWarnings(approx(xx., y.r, xout = xout, method = 'linear')$y)
+	y.. <- try(approx(xx.., y..r, xout = xout, method='linear')$y, silent = TRUE)
+	y... <- try(approx(xx..., y...r, xout = xout)$y, silent = TRUE)
+	y.... <- try(approx(.middle_pts(xx...), y....r, xout = xout)$y, silent = TRUE)
 	#== remove NAs 
-	keep=complete.cases(y..r)
-	y..1=y..r[keep]
-	xx..1=xx..[keep]
+	keep <- complete.cases(y..r)
+	y..1 <- y..r[keep]
+	xx..1 <- xx..[keep]
 	
 	#== if derivatives are possible...
 	#== get locations of sign changes of the logmod of the second derivative
-	(switches=cumsum(rle(sign(logmod(y..1)))[[1]]))
+	switches <- cumsum(rle(sign(logmod(y..1)))[[1]])
 	#-- remove  nans
-	switches[which(switches==length(y..1))]=NA
-	switches=stats::na.omit(switches)
+	switches[which(switches == length(y..1))] <- NA
+	switches <- stats::na.omit(switches)
 		#-- since y is evaluated at the midpoint of the xs get the midpoint...
-	if(length(switches)>0 & any(switches>best.youden)){
-		x.as=(xx..1[switches]+xx..1[switches+1])/2
+	if (length(switches) > 0 & any(switches > best.youden)) {
+		x.as <- (xx..1[switches] + xx..1[switches + 1]) / 2
 		#### x.as=xout[switches]
-		keep=which(x.as>x.youden)[1]
+		keep <- which(x.as > x.youden)[1]
 		if(all(is.na(keep))) {
-			x.as=x.youden
+			x.as <- x.youden
 			message(paste0("Couldn't find a better upper limit than the Youden ",
 			               "threshold, so defaulting to using that for the upper limit. ",
 			               "This can happen if the Youden threshold gives perfect ",
 			               "sensitivity (i.e. there are no sensitivity gains possible ",
 			               "by lowering the threshold)"))
 		} else {
-			x.as=x.as[keep[1]] # this finds the midpoint, need to find the left interval
+			x.as <- x.as[keep[1]] # this finds the midpoint, need to find the left interval
 		}
-		
-		x.ind=findInterval(x.as,xx)
-		y.as=y[x.ind]
-
+		x.ind <- findInterval(x.as, xx)
+		y.as <- y[x.ind]
 	} else {
 		#-- if no asymptote reached, use max sens
-		y.as=max.sens
-		not.root.index=findInterval(max.sens,y)
-		x.as=xx[not.root.index]
+		y.as <- max.sens
+		not.root.index <- findInterval(max.sens, y)
+		x.as <- xx[not.root.index]
 	}
 	#== prep for COR (inverse ROC) to find asymptote
-	y1=1-xx
-	xx1=1-y # plot(xx,y,type='l'); plot(xx1,y1,type='l')
-	xx1.=.middle_pts(xx1)
-	xx1..=.middle_pts(.middle_pts(xx1))
-	xx1...=.middle_pts(.middle_pts(.middle_pts(xx1)))
-	x1out=seq(0,1,length=200)
-	y1.r= .deriv(xx1, y1) # plot(xx1.,y1.r,type='l')
+	y1 <- 1 - xx
+	xx1 <- 1 - y # plot(xx,y,type='l'); plot(xx1,y1,type='l')
+	xx1. <- .middle_pts(xx1)
+	xx1.. <- .middle_pts(.middle_pts(xx1))
+	xx1... <- .middle_pts(.middle_pts(.middle_pts(xx1)))
+	x1out <- seq(0, 1, length = 200)
+	y1.r <- .deriv(xx1, y1) # plot(xx1.,y1.r,type='l')
 	y1..r <- .deriv(xx1., y1.r)# plot(xx1..,y1..r,type='l')
 		# need to turn NaNs in the middle (leading and trailing don't hurt) 
 	  # into +/- Infs so that approx() can proceed below. I'm going to replace NaNs
@@ -192,33 +190,33 @@ trinaryROCRoots <- function(ins,
 	# GEPB 23/Aug/24: Infinite loop if first and last were NaN
 	# y1..r=ifelse(is.nan(y1..r),stats::lag(y1..r,1),y1..r)
 	# while(any(is.nan(y1..r))){ y1..r=ifelse(is.nan(y1..r),lag(y1..r,1),y1..r) }
-	y1..r[y1..r==-Inf]=.Machine$double.xmin
-	y1..r[y1..r==Inf]=.Machine$double.xmax
+	y1..r[y1..r == -Inf] <- .Machine$double.xmin
+	y1..r[y1..r == Inf] <- .Machine$double.xmax
 	# 	check result
 	# data.frame(y1..r,,b=ifelse(is.nan(y1..r),lag(y1..r,1),y1..r),a)
 	y1...r <- .deriv(xx1.., y1..r) # plot(xx1...,y1...r,type='l')
 	y1....r <- .deriv(xx1..., y1...r)
-	y1.=suppressWarnings(approx(xx1.,y1.r,xout=xout)$y) # plot(y1.,type='l')
-	y1..=suppressWarnings(approx(xx1..,y1..r,xout=xout)$y) # plot(y1..,type='l'); plot(xx1..,y1..r,type='l')
-	y1...=suppressWarnings(approx(xx1...,y1...r,xout=xout)$y)
-	y1....=suppressWarnings(approx(.middle_pts(xx1...),y1....r,xout=xout)$y)
+	y1. <- suppressWarnings(approx(xx1., y1.r, xout = xout)$y) # plot(y1.,type='l')
+	y1.. <- suppressWarnings(approx(xx1.., y1..r, xout = xout)$y) # plot(y1..,type='l'); plot(xx1..,y1..r,type='l')
+	y1... <- suppressWarnings(approx(xx1..., y1...r, xout = xout)$y)
+	y1.... <- suppressWarnings(approx(.middle_pts(xx1...), y1....r, xout = xout)$y)
 	####keep=complete.cases(y1..)
 	####y1..1=y1..[keep]
-	keep=complete.cases(y1..r)
-	y1..1=y1..r[keep]
-	(switches=cumsum(rle(sign(logmod(y1..1)))[[1]]))
+	keep <- complete.cases(y1..r)
+	y1..1 <- y1..r[keep]
+	switches <- cumsum(rle(sign(logmod(y1..1)))[[1]])
 	#-- remove  nans
-	switches[which(switches==length(y1..1))]=NA
-	switches=stats::na.omit(switches)
+	switches[which(switches==length(y1..1))] <- NA
+	switches <- stats::na.omit(switches)
 	
 		#-- since y is evaluated at the midpoint of the xs get the midpoint...
 	#if(length(switches)>0 & any(switches>best.youden)){
-	x.lo.inv=min((xx1..[switches]+xx1..[switches+1])/2)
+	x.lo.inv <- min((xx1..[switches] + xx1..[switches + 1]) / 2)
 	#### x.lo=max(xout[switches]) #- not sure this will generally work 
 	#x.lo=x.lo[which(x.lo<y.lo)[1]] # just hoping this is ok
 	
-	x.ind=findInterval(x.lo.inv,rev(xx1))
-	y.lo.inv=rev(y1)[x.ind]
+	x.ind <- findInterval(x.lo.inv, rev(xx1))
+	y.lo.inv <- rev(y1)[x.ind]
 
 	#} else {
 	# 		#-- if no asymptote reached, use max sens
@@ -233,8 +231,8 @@ trinaryROCRoots <- function(ins,
 	# 	plot(x1out,y1.,type='l',log='y')
 	# 	plot(x1out,y1..,type='l',log='y')
 	
-	x.lo=1-y.lo.inv
-	y.lo=1-x.lo.inv
+	x.lo <- 1-y.lo.inv
+	y.lo <- 1-x.lo.inv
 	# this smoothing is just used to get the value of the pAUC, not the actual thresholds
 	a.pauc <- try(pROC::roc(ins[,1], ins[,2], auc = TRUE, 
 	                        partial.auc = 1 - c(x.lo, x.as), 
@@ -267,23 +265,30 @@ trinaryROCRoots <- function(ins,
 	#-- least not without smoothing the thresholds which requires me to do it manually.
 	#a.rough=pROC::roc(ins[,1], ins[,2],quiet=T)
 	#if(class(a.pauc)=='try-error') a.pauc=a.rough
-	threshLo=rev(a.rough$thresholds)[findInterval(x.lo, rev(1-a.rough$specificities))]
-	threshYouden=rev(a.rough$thresholds)[findInterval(x.youden, rev(1-a.rough$specificities))]
-	threshHi=rev(a.rough$thresholds)[findInterval(x.as, rev(1-a.rough$specificities))]
+	threshLo <- rev(a.rough$thresholds)[findInterval(x.lo, 
+	                                                 rev(1 - a.rough$specificities))]
+	threshYouden <- rev(a.rough$thresholds)[findInterval(x.youden, 
+	                                                     rev(1 - a.rough$specificities))]
+	threshHi <- rev(a.rough$thresholds)[findInterval(x.as, 
+	                                                 rev(1 - a.rough$specificities))]
 	
 	#== prep outputs
-	out1=data.frame(lo.thresh.roc.x=x.lo,lo.thresh.roc.y=y.lo, 
-									threshLo=threshLo,			
-									youden.thresh.roc.x=x.youden, youden.thresh.roc.y=y.youden,
-									threshYouden=threshYouden,
-									hi.thresh.roc.x=x.as, hi.thresh.roc.y=y.as,
-									threshHi=threshHi,
-									y.lo.inv=y.lo.inv,   x.lo.inv=x.lo.inv,
-									trinary.pauc=as.numeric(a.pauc$auc))
-	plotThings=list(xx=xx,y=y,y.=y.,y..=y..,xx1=xx1,y1=y1,x1out=x1out, y1..=y1..,
-	                xout=xout,x1out=x1out)
+	out1 <- data.frame(lo.thresh.roc.x = x.lo,
+	                   lo.thresh.roc.y = y.lo, 
+									   threshLo = threshLo,			
+									   youden.thresh.roc.x = x.youden, 
+									   youden.thresh.roc.y = y.youden,
+									   threshYouden = threshYouden,
+									   hi.thresh.roc.x = x.as, 
+									   hi.thresh.roc.y = y.as,
+									   threshHi = threshHi,
+									   y.lo.inv = y.lo.inv,
+									   x.lo.inv = x.lo.inv,
+									   trinary.pauc = as.numeric(a.pauc$auc))
+	plotThings <- list(xx = xx, y = y, y. = y., y.. = y.., xx1 = xx1, y1 = y1,
+	                   x1out = x1out, y1.. = y1.., xout = xout, x1out = x1out)
 	
-	list(trinaryDF=out1,plotThings=plotThings)
+	list(trinaryDF = out1, plotThings = plotThings)
   })
 	return(out)
 }
@@ -371,7 +376,6 @@ trinaryRangeSize <- function(trinaryRasters,
   
   # Calculate the area by value
   r_size <- terra::expanse(trinaryRasters, byValue = TRUE, unit = "km")
-  print(r_size)
   # Initialize the range.size data frame with NA values
   range.size <- data.frame(
     range.size.lo.km2 = NA,
