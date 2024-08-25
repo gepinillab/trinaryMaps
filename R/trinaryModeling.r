@@ -136,8 +136,8 @@ trinaryROCRoots <- function(ins,
 	xx..1 <- xx..[keep]
 	
 	#== if derivatives are possible...
-	#== get locations of sign changes of the logmod of the second derivative
-	switches <- cumsum(rle(sign(logmod(y..1)))[[1]])
+	#== get locations of sign changes of the .logmod of the second derivative
+	switches <- cumsum(rle(sign(.logmod(y..1)))[[1]])
 	#-- remove  nans
 	switches[which(switches == length(y..1))] <- NA
 	switches <- stats::na.omit(switches)
@@ -204,7 +204,7 @@ trinaryROCRoots <- function(ins,
 	####y1..1=y1..[keep]
 	keep <- complete.cases(y1..r)
 	y1..1 <- y1..r[keep]
-	switches <- cumsum(rle(sign(logmod(y1..1)))[[1]])
+	switches <- cumsum(rle(sign(.logmod(y1..1)))[[1]])
 	#-- remove  nans
 	switches[which(switches==length(y1..1))] <- NA
 	switches <- stats::na.omit(switches)

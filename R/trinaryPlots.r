@@ -76,7 +76,7 @@ trinaryROCPlot=function(trinaryPlotThings,
 			if(any(is.infinite(y.tmp)) | all(y.tmp==0)){
 				plot(.5,.5,col='white', main="logmod(ROC'')", xlab='1-specificity',ylab="logmod(sensitivity'')"); graphics::text(.5,.5,'Derivative contains Inf')
 			} else {
-				plot(x.tmp,logmod(y.tmp),type='l',col='black', main="logmod(ROC'')", xlim=c(0,1),xlab='1-specificity',ylab="logmod(sensitivity'')")
+				plot(x.tmp,.logmod(y.tmp),type='l',col='black', main="logmod(ROC'')", xlim=c(0,1),xlab='1-specificity',ylab="logmod(sensitivity'')")
 			}
 
 			abline(h=0,lty=2) 
@@ -117,7 +117,7 @@ trinaryROCPlot=function(trinaryPlotThings,
 			if(any(is.infinite(y.tmp)) | all(y.tmp==0,na.rm=T)){
 				plot(.5,.5,col='white', main="logmod[(Inverse ROC)'']", xlab='1-sensitivity',ylab="logmod(specificity'')"); graphics::text(.5,.5,'Derivative contains Inf')
 			} else {
-				plot(x.tmp,logmod(y.tmp),type='l', main="logmod[(Inverse ROC)'']",xlab='1-sensitivity',ylab="logmod(specificity'')",xlim=c(0,1),ylim=range(logmod(trinaryPlotThings$y1..),na.rm=T))
+				plot(x.tmp,.logmod(y.tmp),type='l', main="logmod[(Inverse ROC)'']",xlab='1-sensitivity',ylab="logmod(specificity'')",xlim=c(0,1),ylim=range(.logmod(trinaryPlotThings$y1..),na.rm=T))
 			}
 		
 			#abline(h=y.lo) # not sure what this was supposed to be... was defined as 1-x.lo.inv in the modeling....
@@ -125,7 +125,7 @@ trinaryROCPlot=function(trinaryPlotThings,
 			abline(v=trinaryDF$x.lo.inv,col='red1',lty=3,lwd=2)
 		}
 		# for third derivative - works but not needed
-		# # 		plot(trinaryPlotThings$xout,logmod(y...),type='l',col='black', log='y',xlim=c(0,1),main="ROC'''")
+		# # 		plot(trinaryPlotThings$xout,.logmod(y...),type='l',col='black', log='y',xlim=c(0,1),main="ROC'''")
 		# # 		abline(h=0,lty=2)
 		# # 		abline(v=x.lo,col='darkgoldenrod2',lty=3,lwd=2)
 		# # 		abline(v=trinaryDF$hi.thresh.roc.x,col='steelblue',lty=3,lwd=2)

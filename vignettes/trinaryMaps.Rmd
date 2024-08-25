@@ -35,7 +35,7 @@ Plots the ROC curve with upper and lower ROC bounds.
 
 Here's an example of how to use the trinaryMapWorkflow function:
 
-```{r}
+```{r workflow}
 library(trinaryMaps)
 library(terra)
 
@@ -53,14 +53,14 @@ tr <- trinaryMapWorkflow(pres = occs,
 ```
 ## Plotting the Trinary Map
 The trinary map is a categorical map that has been transformed into three classes based on the upper and lower bounds calculated by the `trinaryMapWorkflow()` function. This plot provides a visual representation of where the three classes occur. Class 0 corresponds to pixels with values below the higher ROC bound threshold (definitely unoccupied habitat), class 1 correspond to pixels greater or equal to the upper ROC bound threshold but less than the lower ROC bound threshold (marginal, occasional, or uncertain occupied habitat), and class 2 denotes pixels with values above the lower ROC bound threshold (likely occupied habitat).
-```{r}
+```{r plot_raster}
 plot(tr$trinary.rasters)
 points(occs)
 ```
 
 ## Range Size
 This chunk calculates the range sizes associated with each threshold value in the trinary map. The range size is an important metric that can be used to understand the sensitivity and specificity of the model predictions at different threshold values.
-```{r}
+```{r range_size}
 # Area
 trinaryRangeSize(tr$trinary.rasters)
 ```
@@ -82,12 +82,12 @@ To calculate the upper bound threshold, the horizontal and vertical axes are inv
 
 ### logmod(Inverted ROC)
 The second derivative of the inverted ROC curve is calculated after applying a logmod transformation. The red dot marks the **lower ROC bound threshold**.
-```{r}
+```{r ROCplots}
 trinaryROCPlot(tr$threshs$plotThings, trinaryDF = tr$threshs$trinaryDF)
 ```
 
 ## Additional Code
-```{r, eval = FALSE}
+```{r pred, eval = FALSE}
 library(predicts)
 library(maxnet)
 # Load example data
