@@ -1,14 +1,15 @@
 #################################################################
 #################################################################
 #################################################################
-#' Generate trinary maps from species presence, background and model
-#'
-#' This function takes in the species presence and background data, along with a model, and generates trinary maps. It also calculates the range size and plots the maps and ROC curves.
-#'
+#' @title Generate trinary maps from species presence, background and model prediction
+#' @description This function takes in the species presence and background data, 
+#'  along with a model, and generates trinary maps. It also calculates the 
+#'  information for ROC curves.
 #' @param pres A data.frame object containing the species presence data
 #' @param background A data.frame object containing the background data
 #' @param rModel A spatRaster object containing the model data
-#' @param NATo0 A logical indicating whether to turn NA values into zeros in the presence and background data
+#' @param NATo0 A logical indicating whether to turn NA values into zeros in the
+#'  presence and background data
 #' @return A list containing the trinary thresholds and trinary rasters
 #'
 #' @export

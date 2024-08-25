@@ -2,7 +2,7 @@
 % Please edit documentation in R/trinaryWorkflow.r
 \name{trinaryMapWorkflow}
 \alias{trinaryMapWorkflow}
-\title{Generate trinary maps from species presence, background and model}
+\title{Generate trinary maps from species presence, background and model prediction}
 \usage{
 trinaryMapWorkflow(pres, background, rModel, NATo0 = TRUE)
 }
@@ -13,11 +13,14 @@ trinaryMapWorkflow(pres, background, rModel, NATo0 = TRUE)
 
 \item{rModel}{A spatRaster object containing the model data}
 
-\item{NATo0}{A logical indicating whether to turn NA values into zeros in the presence and background data}
+\item{NATo0}{A logical indicating whether to turn NA values into zeros in the
+presence and background data}
 }
 \value{
 A list containing the trinary thresholds and trinary rasters
 }
 \description{
-This function takes in the species presence and background data, along with a model, and generates trinary maps. It also calculates the range size and plots the maps and ROC curves.
+This function takes in the species presence and background data, 
+ along with a model, and generates trinary maps. It also calculates the 
+ information for ROC curves.
 }
