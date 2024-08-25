@@ -2,7 +2,11 @@
 title: "Trinary Maps Vignette"
 author: "Cory Merow and Gonzalo E. Pinilla-Buitrago"
 date: "2014-08-31"
-output: html_document
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Title of Your Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
@@ -33,45 +37,25 @@ Here's an example of how to use the trinaryMapWorkflow function:
 
 ```{r}
 library(trinaryMaps)
-library(maxnet)
-library(predicts)
 library(terra)
 
-# Load example data
-occurence <- system.file("/ex/bradypus.csv", package = "predicts")
-occ <- read.csv(occurence)[, -1]
-f <- system.file("ex/bio.tif", package="predicts")
-envs <- terra::rast(f)
+# YOU CAN REGENERATE THE OCCURRENCE, BACKGROUND AND RASTER PREDICTION OF 
+# THIS EXAMPLE USING THE CODE AT THE END OF THIS VIGNETTE
+ext_data <- system.file("extdata", package = 'trinaryMaps')
 
-# Prepare data for modeling
-data <- terra::values(envs) |> as.data.frame()
-data$ID <- 1:(terra::nrow(envs) * terra::ncol(envs))
-occs.p <- terra::extract(envs, occ, cells = TRUE)
-data$p <- rep(0, terra::ncell(envs))
-data$p[occs.p$cell] <- 1
-data$x <- terra::xFromCell(envs, 1:terra::ncell(envs))
-data$y <- terra::yFromCell(envs, 1:terra::ncell(envs))
-data <- na.omit(data)
-
-# Build and predict model
-mod <- maxnet(data$p, data[, 1:9])
-p.vals <- predict(mod, terra::values(envs), type = "cloglog")
-suitability <- rep(NA, terra::ncell(envs))
-suitability[data$ID] <- p.vals
-r <- envs[[1]]
-names(r) <- "suitability"
-terra::values(r) <- suitability
-
+occs <- read.csv(paste0(ext_data, "/occs.csv"))
+bg <- read.csv(paste0(ext_data, "/bg.csv"))
+r <- terra::rast(paste0(ext_data, "/prediction.tif"))
 # Run trinaryMapWorkflow
-tr <- trinaryMapWorkflow(pres = data[data$p == 1, c("x", "y")], 
-                         background = data[data$p == 0, c("x", "y")], 
+tr <- trinaryMapWorkflow(pres = occs, 
+                         background = bg, 
                          rModel = r)
 ```
 ## Plotting the Trinary Map
 The trinary map is a categorical map that has been transformed into three classes based on the upper and lower bounds calculated by the `trinaryMapWorkflow()` function. This plot provides a visual representation of where the three classes occur. Class 0 corresponds to pixels with values below the higher ROC bound threshold (definitely unoccupied habitat), class 1 correspond to pixels greater or equal to the upper ROC bound threshold but less than the lower ROC bound threshold (marginal, occasional, or uncertain occupied habitat), and class 2 denotes pixels with values above the lower ROC bound threshold (likely occupied habitat).
 ```{r}
 plot(tr$trinary.rasters)
-points(occ)
+points(occs)
 ```
 
 ## Range Size
@@ -101,3 +85,36 @@ The second derivative of the inverted ROC curve is calculated after applying a l
 ```{r}
 trinaryROCPlot(tr$threshs$plotThings, trinaryDF = tr$threshs$trinaryDF)
 ```
+
+## Additional Code
+```{r, eval = FALSE}
+library(predicts)
+library(maxnet)
+# Load example data
+occurence <- system.file("/ex/bradypus.csv", package = "predicts")
+occ <- read.csv(occurence)[, -1]
+f <- system.file("ex/bio.tif", package = "predicts")
+envs <- terra::rast(f)
+
+# Prepare data for modeling
+data <- terra::values(envs) |> as.data.frame()
+data$ID <- 1:(terra::nrow(envs) * terra::ncol(envs))
+occs.p <- terra::extract(envs, occ, cells = TRUE)
+data$p <- rep(0, terra::ncell(envs))
+data$p[occs.p$cell] <- 1
+data$x <- terra::xFromCell(envs, 1:terra::ncell(envs))
+data$y <- terra::yFromCell(envs, 1:terra::ncell(envs))
+data <- na.omit(data)
+
+# Build and predict model
+mod <- maxnet(data$p, data[, 1:9])
+p.vals <- predict(mod, terra::values(envs), type = "cloglog")
+suitability <- rep(NA, terra::ncell(envs))
+suitability[data$ID] <- p.vals
+r <- envs[[1]]
+names(r) <- "suitability"
+terra::values(r) <- suitability
+occs <- data[data$p == 1, c("x", "y")]
+bg <- data[data$p == 0, c("x", "y")]
+```
+
