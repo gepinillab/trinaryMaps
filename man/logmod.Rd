@@ -22,3 +22,4 @@ result has the same sign as the input \code{x}.
 logmod(10)
 logmod(-5)
 }
+\keyword{internal}
