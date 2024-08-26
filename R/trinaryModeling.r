@@ -62,7 +62,7 @@ trinaryROCRoots <- function(ins,
 	  x.youden <- (1 - a$specificities)[best.youden]
 		#== take the smallest value above the threshold. this ensures that you 
 	  #== choose an actual threshold (and not -Inf) if the AUC is perfect
-	  threshYouden <- rev(a.rough$thresholds)[(findInterval(x.youden, 
+	  thr.youden <- rev(a.rough$thresholds)[(findInterval(x.youden, 
 	                                                        rev(1 - a.rough$specificities)) + 1)]
 	  #== coords for ROC 
 	  xx <- rev(1 - a$specificities)
@@ -73,7 +73,7 @@ trinaryROCRoots <- function(ins,
 		                 "to find   reasonable trinary thresholds. Returning results ",
 		                 "using the minimum predicted value at training presence as ", 
 		                 "the lower threshold and the 30% training presence quantile",
-		                 " as the upper threshold. The max(sensitivity+specificity)) ",
+		                 " as the upper threshold. The max(sensitivity + specificity)) ",
 		                 "was still calculated as usual, but note that it may not be ",
 		                 "between these upper and lower bounds for very small sample ",
 		                 "sizes."))
@@ -81,36 +81,36 @@ trinaryROCRoots <- function(ins,
 		#== make the low value the minimum value at a predicted presence - 2sd (since 
 	  #== smale sample sizes end up just predicting the presence points are the 
 	  #== only places occupied). 2 sd chosen because ...
-	  sd1 <- sd(ins$X[ins$Y==1])
-		threshLo <- min(ins$X[ins$Y==1]) - sdMultiplier * sd1
-		if (threshLo < 0) {
+	  sd1 <- sd(ins$X[ins$Y == 1])
+		thr.roc.lo <- min(ins$X[ins$Y == 1]) - sdMultiplier * sd1
+		if (thr.roc.lo < 0) {
 			message(paste0("The value of `sdMultiplier` you used lead to a negative ",
 			               "threshold. I'm changing it to zero by default (so your ",
 			               "lower threshold is the minimim value at training presences)"))
-			threshLo <- min(ins$X[ins$Y == 1])
+			thr.roc.lo <- min(ins$X[ins$Y == 1])
 		}
-		lo.thresh.roc.x <- (sum(ins$X[ins$Y == 0] >= threshLo) / length(ins$X[ins$Y == 0]))
+		lo.thresh.roc.x <- (sum(ins$X[ins$Y == 0] >= thr.roc.lo) / length(ins$X[ins$Y == 0]))
 		lo.thresh.roc.y <- 1
 		#== make the hi value the .3 quantile of predicted presence, cuz you'd never 
 		#== want a model with <70% sensitivity
-		threshHi <- quantile(ins$X[ins$Y == 1], maxTPQuantile)
-		hi.thresh.roc.y <- sum(ins$X[ins$Y == 1] >= threshHi) / length(ins$X[ins$Y == 1])
-		hi.thresh.roc.x <- (sum(ins$X[ins$Y==0] > threshHi) / length(ins$X[ins$Y == 0]))
+		thr.roc.hi <- quantile(ins$X[ins$Y == 1], maxTPQuantile)
+		hi.thresh.roc.y <- sum(ins$X[ins$Y == 1] >= thr.roc.hi) / length(ins$X[ins$Y == 1])
+		hi.thresh.roc.x <- (sum(ins$X[ins$Y==0] > thr.roc.hi) / length(ins$X[ins$Y == 0]))
 			# I think these shouldnb't be reported cuz the inverse wasn't calculated
 		# y.lo.inv=1-x.lo 
 		# x.lo.inv=1-y.lo
-		out1 <- data.frame(lo.thresh.roc.x = lo.thresh.roc.x,
+		out1 <- data.frame(thr.roc.lo = thr.roc.lo,
+		                   thr.youden = thr.youden,
+		                   thr.roc.hi = thr.roc.hi,
+		                   trinary.pauc = as.numeric(a.rough$auc),
+		                   lo.thresh.roc.x = lo.thresh.roc.x,
 										   lo.thresh.roc.y = lo.thresh.roc.y, 		
-										   threshLo = threshLo,			
 										   youden.thresh.roc.x = x.youden,
 										   youden.thresh.roc.y = y.youden, 
-										   threshYouden = threshYouden, 
 										   hi.thresh.roc.x = hi.thresh.roc.x, 
 										   hi.thresh.roc.y = hi.thresh.roc.y,
-										   threshHi = threshHi, 
 										   y.lo.inv = NA,
-										   x.lo.inv = NA,
-										   trinary.pauc = as.numeric(a.rough$auc))
+										   x.lo.inv = NA)
 		plotThings <- list(xx = xx, y = y, y. = NULL, y.. = NULL, 
 	                     y1 = NULL, y1.. = NULL, xout = NULL, x1out = NULL)
 		return(list(trinaryDF = out1, plotThings = plotThings))
@@ -159,7 +159,7 @@ trinaryROCRoots <- function(ins,
 		x.ind <- findInterval(x.as, xx)
 		y.as <- y[x.ind]
 	} else {
-		#-- if no asymptote reached, use max sens
+	  #-- if no asymptote reached, use max sens
 		y.as <- max.sens
 		not.root.index <- findInterval(max.sens, y)
 		x.as <- xx[not.root.index]
@@ -206,7 +206,7 @@ trinaryROCRoots <- function(ins,
 	y1..1 <- y1..r[keep]
 	switches <- cumsum(rle(sign(.logmod(y1..1)))[[1]])
 	#-- remove  nans
-	switches[which(switches==length(y1..1))] <- NA
+	switches[which(switches == length(y1..1))] <- NA
 	switches <- stats::na.omit(switches)
 	
 		#-- since y is evaluated at the midpoint of the xs get the midpoint...
@@ -265,26 +265,26 @@ trinaryROCRoots <- function(ins,
 	#-- least not without smoothing the thresholds which requires me to do it manually.
 	#a.rough=pROC::roc(ins[,1], ins[,2],quiet=T)
 	#if(class(a.pauc)=='try-error') a.pauc=a.rough
-	threshLo <- rev(a.rough$thresholds)[findInterval(x.lo, 
+	thr.roc.lo <- rev(a.rough$thresholds)[findInterval(x.lo, 
 	                                                 rev(1 - a.rough$specificities))]
-	threshYouden <- rev(a.rough$thresholds)[findInterval(x.youden, 
+	thr.youden <- rev(a.rough$thresholds)[findInterval(x.youden, 
 	                                                     rev(1 - a.rough$specificities))]
-	threshHi <- rev(a.rough$thresholds)[findInterval(x.as, 
+	thr.roc.hi <- rev(a.rough$thresholds)[findInterval(x.as, 
 	                                                 rev(1 - a.rough$specificities))]
 	
 	#== prep outputs
-	out1 <- data.frame(lo.thresh.roc.x = x.lo,
+	out1 <- data.frame(thr.roc.lo = thr.roc.lo,	
+	                   thr.youden = thr.youden,
+	                   thr.roc.hi = thr.roc.hi,
+	                   trinary.pauc = as.numeric(a.pauc$auc),
+	                   lo.thresh.roc.x = x.lo,
 	                   lo.thresh.roc.y = y.lo, 
-									   threshLo = threshLo,			
 									   youden.thresh.roc.x = x.youden, 
 									   youden.thresh.roc.y = y.youden,
-									   threshYouden = threshYouden,
 									   hi.thresh.roc.x = x.as, 
 									   hi.thresh.roc.y = y.as,
-									   threshHi = threshHi,
 									   y.lo.inv = y.lo.inv,
-									   x.lo.inv = x.lo.inv,
-									   trinary.pauc = as.numeric(a.pauc$auc))
+									   x.lo.inv = x.lo.inv)
 	plotThings <- list(xx = xx, y = y, y. = y., y.. = y.., xx1 = xx1, y1 = y1,
 	                   x1out = x1out, y1.. = y1.., xout = xout, x1out = x1out)
 	
@@ -302,9 +302,9 @@ trinaryROCRoots <- function(ins,
 #'
 #' @description Use previously calculated thresholds to make trinary maps
 #' @param rModel spatRaster representing continuous model predictions
-#' @param threshLo lower threshold value; typically determined from the 
+#' @param thr.roc.lo lower threshold value; typically determined from the 
 #' output of `trinaryROCRoots()`
-#' @param threshHi upper threshold value; typically determined from the 
+#' @param thr.roc.hi upper threshold value; typically determined from the 
 #' output of `trinaryROCRoots()`
 #' @param rasterOutputPath optional file name to write out a raster.
 #' @param ... optional arguments to pass to `terra::writeRaster`
@@ -314,8 +314,8 @@ trinaryROCRoots <- function(ins,
 
 # should add the option to use a map in memory
 trinaryMap <- function(rModel,
-									   	 threshLo,
-										   threshHi,
+									   	 thr.roc.lo,
+										   thr.roc.hi,
 										   rasterOutputPath = NULL,
 										   ...
 										   ) {
@@ -325,12 +325,12 @@ trinaryMap <- function(rModel,
 	  #== make trinary maps
 	  trinary.rasters <- terra::rast(lapply(1:(terra::nlyr(rModel)),
 												function(x) { 
-													 out1 <- rModel[[x]] >= threshLo
-													 out2 <- rModel[[x]] >= threshHi
+													 out1 <- rModel[[x]] >= thr.roc.lo
+													 out2 <- rModel[[x]] >= thr.roc.hi
 													 out3 <- out1 + out2
 													 names(out3) <- paste0(modelNames[x], '_', 
-													                       round(threshLo, 2), '_', 
-													                       round(threshHi, 2))
+													                       round(thr.roc.lo, 2), '_', 
+													                       round(thr.roc.hi, 2))
 													 return(out3)
 											})) 
 									 
@@ -352,16 +352,12 @@ trinaryMap <- function(rModel,
 #' @title Calculate upper and lower limits of range size
 #' @description Size limits based on trinary thresholds
 #' @param trinaryRasters a spatRaster describing a trinary map. It is assumed that 
-#'  values of 0 are absent, values of 1 represent the lower bound, and values 
-#'  of 2 represent the upper bound (e.g., as determined by `trinaryROCRoots`())
-#' @param otherBinaryRaster optional additional binary raster for which range 
-#'  size is desired. This can be useful, e.g., if you have an additional 
-#'  intermediate threshold of interest (e.g., the max (sensitivity +specificity)).
-#' @return a data.frame with the lower, upper, and optimal (Youden threshold) range size
-#' @author Cory Merow <cory.merow@@gmail.com>
+#'  values of 0 are absent, values of 1 represent the upper ROC bound, and values 
+#'  of 2 represent the lower ROC bound (e.g., as determined by `trinaryROCRoots`())
+#' @return a data.frame with the lower and upper ROC bounds.
+#' @author Cory Merow <cory.merow@@gmail.com>, Gonzalo E. Pinilla-Buitrago <gepinillab@@gmail.com>
 #' @export
-trinaryRangeSize <- function(trinaryRasters,
-                             otherBinaryRaster = NULL) {
+trinaryRangeSize <- function(trinaryRasters) {
   
   # Check if trinaryRasters is a SpatRaster
   if (!inherits(trinaryRasters, "SpatRaster")) {
@@ -379,11 +375,7 @@ trinaryRangeSize <- function(trinaryRasters,
   # Initialize the range.size data frame with NA values
   range.size <- data.frame(
     range.size.lo.km2 = NA,
-    range.size.hi.km2 = NA,
-    range.size.other.km2 = ifelse(!is.null(otherBinaryRaster), 
-                                  sum(terra::values(otherBinaryRaster) > 0, 
-                                      na.rm = TRUE), NA)
-  )
+    range.size.hi.km2 = NA)
   
   # Assign values if they exist in r_size
   if (2 %in% r_size[, "value"]) {

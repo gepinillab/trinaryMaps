@@ -4,15 +4,15 @@
 \alias{trinaryMap}
 \title{Make trinary maps}
 \usage{
-trinaryMap(rModel, threshLo, threshHi, rasterOutputPath = NULL, ...)
+trinaryMap(rModel, thr.roc.lo, thr.roc.hi, rasterOutputPath = NULL, ...)
 }
 \arguments{
 \item{rModel}{spatRaster representing continuous model predictions}
 
-\item{threshLo}{lower threshold value; typically determined from the 
+\item{thr.roc.lo}{lower threshold value; typically determined from the 
 output of `trinaryROCRoots()`}
 
-\item{threshHi}{upper threshold value; typically determined from the 
+\item{thr.roc.hi}{upper threshold value; typically determined from the 
 output of `trinaryROCRoots()`}
 
 \item{rasterOutputPath}{optional file name to write out a raster.}

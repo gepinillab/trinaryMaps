@@ -4,7 +4,16 @@
 \alias{trinaryMapWorkflow}
 \title{Generate trinary maps from species presence, background and model prediction}
 \usage{
-trinaryMapWorkflow(pres, background, rModel, NATo0 = TRUE)
+trinaryMapWorkflow(
+  pres,
+  background,
+  rModel,
+  NATo0 = TRUE,
+  maxTPQuantile = 0.3,
+  sdMultiplier = 2,
+  max.sens = 0.95,
+  smoothMethod = "binormal"
+)
 }
 \arguments{
 \item{pres}{A data.frame object containing the species presence data}
@@ -15,6 +24,24 @@ trinaryMapWorkflow(pres, background, rModel, NATo0 = TRUE)
 
 \item{NATo0}{A logical indicating whether to turn NA values into zeros in the
 presence and background data}
+
+\item{maxTPQuantile}{A numeric value representing the quantile of the predicted 
+values at presence locations used to determine the upper threshold for 
+presence predictions. For example, a value of `0.3` means the function 
+uses the 30th percentile of the predicted presence values as the upper 
+threshold, ensuring that the model maintains at least 70% 
+sensitivity. Default is `0.3`.}
+
+\item{sdMultiplier}{A numeric value that controls the adjustment of the lower 
+threshold for presence predictions. It multiplies the standard deviation of 
+the predicted values at presence locations to define this lower threshold. 
+If this threshold results in a negative value, it is adjusted to zero 
+by default. Default is `2`.}
+
+\item{max.sens}{value of sensitivity to use if no upper limit is found based 
+on derivatives. default is 0.95}
+
+\item{smoothMethod}{default is 'binormal'}
 }
 \value{
 A list containing the trinary thresholds and trinary rasters
