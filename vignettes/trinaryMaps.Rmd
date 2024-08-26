@@ -86,6 +86,31 @@ The second derivative of the inverted ROC curve is calculated after applying a l
 trinaryROCPlot(tr$threshs$plotThings, trinaryDF = tr$threshs$trinaryDF)
 ```
 
+# Custom example (trinaryROCRoots)** (GEPB needs to ask CM)
+The `trinaryMapWorkflow()` function calculates the upper and lower ROC bounds using default parameters. If you want to customize the calculation of both bounds, you can modify the following parameters:
+
+- `maxTPQuantile`: A quantile value representing the predicted values at presence locations used to determine the upper ROC threshold for presence predictions. For example, a value of `0.3` means the function uses the 30th percentile of the predicted presence values as the upper threshold, ensuring that the model maintains at least 70% sensitivity.
+
+- `sdMultiplier`: A scaling factor applied to the standard deviation of the predictions, used inconjunction with max.sens to calculate the lower ROC bound.
+
+- `max.sens`: The maximum true positive rate allowed for the lower ROC bound calculation. This parameter is used in combination with sdMultiplier to determine the optimal threshold for the lower bound.
+
+Here, we will modified the maximum quantile to 20th percentile, and change the maximum sensitivity allowed for the lower ROC bound to 0.99.
+```{r ROCroots}
+# Issues with maxTPQuantile, max.sens, and sdMultiplier. Results are the same that previus example.
+tr2 <- trinaryMapWorkflow(pres = occs, 
+                          background = bg, 
+                          rModel = r, 
+                          maxTPQuantile = 0.5,
+                          max.sens = 0.7)
+plot(tr2$trinary.rasters)
+
+```
+
+```{r}
+trinaryROCPlot(tr2$threshs$plotThings, trinaryDF = tr2$threshs$trinaryDF)
+```
+
 ## Additional Code
 ```{r pred, eval = FALSE}
 library(predicts)
