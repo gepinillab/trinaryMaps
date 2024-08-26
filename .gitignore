@@ -25,3 +25,4 @@ vignettes/*.pdf
 .DS_Store
 .Rbuildignore
 .Rproj.user
+docs
