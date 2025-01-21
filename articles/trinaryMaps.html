@@ -8,8 +8,8 @@
 <title>Trinary Maps Vignette • trinaryMaps</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Trinary Maps Vignette">
 </head>
 <body>
@@ -53,7 +53,7 @@
                         <h4 data-toc-skip class="author">Cory Merow and
 Gonzalo E. Pinilla-Buitrago</h4>
             
-            <h4 data-toc-skip class="date">2014-08-31</h4>
+            <h4 data-toc-skip class="date">2024-08-31</h4>
       
 
       <div class="d-none name"><code>trinaryMaps.Rmd</code></div>
@@ -118,12 +118,12 @@ coordinates (data.frame) 3. Background coordinates (data.frame)</p>
 point for using the package. It performs the following steps: 1.
 Calculates upper and lower ROC bounds 2. Creates a trinary map based on
 these bounds 3. Calculates range sizes associated with the generated
-trinary map Plots the ROC curve with upper and lower ROC bounds.</p>
+trinary map 4. Plots the ROC curve with upper and lower ROC bounds.</p>
 <p>Here’s an example of how to use the trinaryMapWorkflow function:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gepinillab.github.io/trinaryMaps/">trinaryMaps</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## terra 1.7.78</span></span></code></pre>
+<pre><code><span><span class="co">## terra 1.8.10</span></span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># YOU CAN REGENERATE THE OCCURRENCE, BACKGROUND AND RASTER PREDICTION OF </span></span>
 <span><span class="co"># THIS EXAMPLE USING THE CODE AT THE END OF THIS VIGNETTE</span></span>
@@ -222,7 +222,8 @@ ROC bound threshold</strong>.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="custom-example-trinaryrocroots-gepb-needs-to-ask-cm">Custom example (trinaryROCRoots)** (GEPB needs to ask CM)<a class="anchor" aria-label="anchor" href="#custom-example-trinaryrocroots-gepb-needs-to-ask-cm"></a>
+<h2 id="custom-example-trinaryrocroots-gepb-2025-01-21-not-working--waiting-for-corys-reply-e-mail-2024-08-25">Custom example (trinaryROCRoots) GEPB [2025-01-21]: NOT WORKING.
+Waiting for Cory´s reply e-mail (2024-08-25)<a class="anchor" aria-label="anchor" href="#custom-example-trinaryrocroots-gepb-2025-01-21-not-working--waiting-for-corys-reply-e-mail-2024-08-25"></a>
 </h2>
 <p>The <code><a href="../reference/trinaryMapWorkflow.html">trinaryMapWorkflow()</a></code> function calculates the upper
 and lower ROC bounds using default parameters. If you want to customize
@@ -251,8 +252,8 @@ change the maximum sensitivity allowed for the lower ROC bound to
 <span><span class="va">tr2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/trinaryMapWorkflow.html">trinaryMapWorkflow</a></span><span class="op">(</span>pres <span class="op">=</span> <span class="va">occs</span>, </span>
 <span>                          background <span class="op">=</span> <span class="va">bg</span>, </span>
 <span>                          rModel <span class="op">=</span> <span class="va">r</span>, </span>
-<span>                          maxTPQuantile <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>                          max.sens <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span></span></code></pre></div>
+<span>                          maxTPQuantile <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>                          max.sens <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## 94 presences and 9681 background points used for building trinary maps</span></span></code></pre>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">tr2</span><span class="op">$</span><span class="va">trinary.rasters</span><span class="op">)</span></span></code></pre></div>
@@ -305,7 +306,7 @@ change the maximum sensitivity allowed for the lower ROC bound to
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>
