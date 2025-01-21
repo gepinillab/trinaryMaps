@@ -1,7 +1,7 @@
 ---
 title: "Trinary Maps Vignette"
 author: "Cory Merow and Gonzalo E. Pinilla-Buitrago"
-date: "2014-08-31"
+date: "2024-08-31"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Title of Your Vignette}
@@ -31,7 +31,7 @@ The `trinaryMapWorkflow()` function is the main entry point for using the packag
 1. Calculates upper and lower ROC bounds
 2. Creates a trinary map based on these bounds
 3. Calculates range sizes associated with the generated trinary map
-Plots the ROC curve with upper and lower ROC bounds.
+4. Plots the ROC curve with upper and lower ROC bounds.
 
 Here's an example of how to use the trinaryMapWorkflow function:
 
@@ -86,7 +86,7 @@ The second derivative of the inverted ROC curve is calculated after applying a l
 trinaryROCPlot(tr$threshs$plotThings, trinaryDF = tr$threshs$trinaryDF)
 ```
 
-# Custom example (trinaryROCRoots)** (GEPB needs to ask CM)
+# Custom example (trinaryROCRoots) GEPB [2025-01-21]: NOT WORKING. Waiting for Cory´s reply e-mail (2024-08-25)
 The `trinaryMapWorkflow()` function calculates the upper and lower ROC bounds using default parameters. If you want to customize the calculation of both bounds, you can modify the following parameters:
 
 - `maxTPQuantile`: A quantile value representing the predicted values at presence locations used to determine the upper ROC threshold for presence predictions. For example, a value of `0.3` means the function uses the 30th percentile of the predicted presence values as the upper threshold, ensuring that the model maintains at least 70% sensitivity.
@@ -101,8 +101,8 @@ Here, we will modified the maximum quantile to 20th percentile, and change the m
 tr2 <- trinaryMapWorkflow(pres = occs, 
                           background = bg, 
                           rModel = r, 
-                          maxTPQuantile = 0.5,
-                          max.sens = 0.7)
+                          maxTPQuantile = 0.01,
+                          max.sens = 0.01)
 plot(tr2$trinary.rasters)
 
 ```
